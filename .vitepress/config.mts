@@ -37,20 +37,42 @@ export default defineConfig({
         text: 'Building Your Application',
         items: [
           { text: 'Configuration', link: '/docs/config' },
-          { text: 'Routing', link: '/docs/routing' },
-          { text: 'ACL', link: '/docs/acl' },
-          { text: 'Model', link: '/docs/model' },
           { text: 'Controller', link: '/docs/controller' },
-          { text: 'Middleware', link: '/docs/middleware' },
-          { text: 'Command Line', link: '/docs/cli' },
-          { text: 'Deployment Strategy', link: '/docs/deployment' },
+          { text: 'Model', link: '/docs/model' },
+          { text: 'RPC', link: '/docs/rpc' },
+          { text: 'ACL', link: '/docs/acl' },
           { text: 'Testing', link: '/docs/testing' },
         ]
       },
       {
-        text: 'Observability',
+        text: 'Commands',
         items: [
-          { text: 'Open Telemetry', link: '/docs/open-telemetry' },
+          { text: 'Overview', link: '/docs/cli/'},
+          { text: 'apply', link: '/docs/cli/apply'},
+          { text: 'build', link: '/docs/cli/build'},
+          { text: 'completion', link: '/docs/cli/completion'},
+          { text: 'configure', link: '/docs/cli/configure'},
+          { text: 'generate', link: '/docs/cli/generate'},
+          { text: 'help', link: '/docs/cli/help'},
+          { text: 'imports', link: '/docs/cli/imports'},
+          { text: 'init', link: '/docs/cli/init'},
+          { text: 'run', link: '/docs/cli/run'},
+          { text: 'serve', link: '/docs/cli/serve'},
+          { text: 'start', link: '/docs/cli/start'},
+          { text: 'version', link: '/docs/cli/version'},
+        ]
+      },
+      {
+        text: 'Deployment Strategy',
+        items: [
+          { text: 'Binary', link: '/docs/deploy/binary' },
+          { text: 'Kubernetes', link: '/docs/deploy/k8s' },
+        ]
+      },
+      {
+        text: 'Middlewares',
+        items: [
+          { text: 'Global', link: '/docs/middleware/' },
         ]
       },
       {
@@ -67,7 +89,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
+      { icon: 'github', link: 'https://github.com/sev-2/raiden' }
     ]
   }
 })

@@ -13,6 +13,21 @@ In Supabase, ACL (Access Control Lists) and RLS (Row-Level Security) are essenti
 - Model definition in Raiden can be used for managing access control. The ACL allows to grant or revoke permissions to users and roles.
 - Enforcement occurs automatically, regardless of how users interact with the database, whether through SQL queries, RPC, application code, or Supabase's client libraries.
 
+## Role Definition
+
+::: code-group
+
+```go [internal/roles/anon.go]
+package roles
+
+import (
+    "github.com/sev-2/raiden/pkg/postgres"
+)
+
+```
+
+:::
+
 ## ACL Definition on Model
 
 You can ACL value on model. Please read [Model](/docs/model) to know more about it.
@@ -34,34 +49,4 @@ The available values:
 
 ::: info
 Service key can bypass the ACL.
-:::
-
-## Role Definition
-
-::: code-group
-
-```go [internal/roles/anon.go]
-package roles
-
-import (
-    "github.com/sev-2/raiden/pkg/postgres"
-)
-
-var Anon = &postgres.Role{
-    ActiveConnections : 0,
-    CanBypassRLS : false,
-    CanCreateDB : false,
-    CanCreateRole : false,
-    CanLogin : false,
-    Config : map[string]any{"statement_timeout": "3s"},
-    ConnectionLimit : 60,
-    ID : 16478,
-    InheritRole : true,
-    IsReplicationRole : false,
-    IsSuperuser : false,
-    Name : "anon",
-    ValidUntil : nil,
-}
-```
-
 :::

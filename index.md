@@ -21,4 +21,7 @@ features:
     details: Streamlines the creation and management of RPCs, Edge Functions, and APIs, offering a centralized way to handle backend logic.
   - title: Schema Consistency
     details: Tools to manage database schemas with ease, ensuring consistency across different stages of development.
+  # - title: Modular
+  #   details:
+
 ---

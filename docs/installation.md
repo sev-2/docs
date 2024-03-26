@@ -41,8 +41,4 @@ brew install sev-2/raiden
 
 ## Windows
 
-Using Scoop
-
-```sh
-scoop install raiden
-```
+Download the latest version of Raiden at https://raiden.sev-2.com/raiden.exe

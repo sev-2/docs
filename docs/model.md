@@ -28,20 +28,34 @@ import (
 )
 
 type Books struct {
-    Id int64 `json:"id,omitempty" column:"id"`
-    Title *string `json:"title,omitempty" column:"title"`
-    Body *string `json:"body,omitempty" column:"body"`
-    CreatedAt *time.Time `json:"created_at,omitempty" column:"created_at"`
+    Id int64 `json:"id,omitempty" column:"name:id;type:bigint;primaryKey;autoIncrement;nullable:false"`
+    Title *string `json:"title,omitempty" column:"name:title;type:varchar;nullable;default:'255'::character varying"`
+    Body *string `json:"body,omitempty" column:"name:body;type:text;nullable"`
+    CreatedAt *time.Time `json:"created_at,omitempty" column:"name:created_at;type:timestampz;nullable;default:now()"`
 
-    Metadata string `schema:"public"`
-    Acl string `read:"" write:"public"`
+    // Table information
+    Metadata string `json:"-" schema:"public"`
+
+    // Access control
+    Acl string `json:"-" read:"" write:""`
 }
 ```
 
 :::
 
-You can create a column of a table by define it with `column:"name"`.
+You can create a column of a table by define it with `column:` struct tag.
 The type of column based on Go struct's field type.
+
+Available struct tag values inside `column:`:
+
+| Name            | Required | Description |
+|-----------------|----------| ------------|
+| `name`          | Yes      | The name of column. |
+| `type`          | Yes      | [PostgreSQL data types](https://www.postgresql.org/docs/current/datatype.html) such as `bigint`, `boolean`, `varying`, `text`, `date` |
+| `primaryKey`    | No       | Column with this key will be Primary Key. |
+| `autoIncrement` | No       | Column with this key will be auto-incrementing. The column must be a numeric. |
+| `nullable`      | No       | To determine a column is nullable or not by define `nullable:true` or `nullable:false`. |
+| `default`       | No       | The default value of column based on column data type. Example: `default:'255'` or `default:now()`. |
 
 The `json:"body,omitempty` will be the JSON key of response.
 To understand about JSON encoding on Go, read https://pkg.go.dev/encoding/json.
@@ -55,7 +69,7 @@ Usually the value of schema is `public`.
 type Books struct {
     // ...
 
-    Metadata string `schema:"public"` // [!code highlight]
+    Metadata string `json:"-" schema:"public"` // [!code highlight]
 }
 ```
 
