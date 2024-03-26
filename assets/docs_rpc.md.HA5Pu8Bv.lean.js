@@ -1,0 +1,1 @@
+import{_ as s,c as i,o as a,V as n}from"./chunks/framework.sH_TUDjc.js";const o=JSON.parse('{"title":"RPC","description":"","frontmatter":{"title":"RPC"},"headers":[],"relativePath":"docs/rpc.md","filePath":"docs/rpc.md"}'),l={name:"docs/rpc.md"},p=n("",9),h=[p];function t(k,e,r,d,E,g){return a(),i("div",null,h)}const y=s(l,[["render",t]]);export{o as __pageData,y as default};
