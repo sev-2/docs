@@ -12,6 +12,17 @@ sh -c "$(curl -fsSL https://raiden.sev-2.com/install.sh)"
 
 The command above will detect your OS and CPU architecture, then install it to your `$PATH`.
 
+```
+cp raiden-linux-amd64 /usr/local/bin/raiden
+chmod +x /usr/local/bin/raiden
+raiden version
+```
+
+::: info
+The file name that you downloaded might have different name, it depends on your OS and machine architecture.
+For macOS the name will be `raiden-macos-amd64` or `raiden-linux-arm64`.
+:::
+
 If you prefer manual way to install Raiden, we also provide a way to install Raiden on specific OS.
 
 ## Ubuntu/Debian

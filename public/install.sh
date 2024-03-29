@@ -25,7 +25,7 @@ OS=$(detect_os)
 ARCH=$(detect_architecture)
 REPO_OWNER="sev-2"
 REPO_NAME="raiden"
-RELEASE_TAG="v1.0.0-alpha.1"
+RELEASE_TAG="v1.0.0-alpha.2"
 DOWNLOAD_URL="https://github.com/$REPO_OWNER/$REPO_NAME/releases/download/$RELEASE_TAG"
 
 # Download binary according to OS and architecture
@@ -43,7 +43,7 @@ case "$OS" in
 esac
 
 # Download the binary
-echo "Downloading binary from $DOWNLOAD_URL..."
+echo "Downloading binary from $DOWNLOAD_URL"
 curl -LO "$DOWNLOAD_URL"
 
 echo "Binary downloaded successfully!"
