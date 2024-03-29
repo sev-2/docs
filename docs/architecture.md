@@ -37,4 +37,4 @@ The built-in CLI command.
 
 ## Scheduler
 
-Raiden included with scheduler or cron — a mechanism to execute a code based on time-period or specific time. [Read more](/docs/scheduler)
+Raiden included with scheduler or cron — a mechanism to execute a code based on time-period or specific time.
