@@ -25,7 +25,7 @@ OS=$(detect_os)
 ARCH=$(detect_architecture)
 REPO_OWNER="sev-2"
 REPO_NAME="raiden"
-RELEASE_TAG="v1.0.0-alpha.3"
+RELEASE_TAG="v1.0.0-alpha.4"
 DOWNLOAD_URL="https://github.com/$REPO_OWNER/$REPO_NAME/releases/download/$RELEASE_TAG"
 
 # Download binary according to OS and architecture
