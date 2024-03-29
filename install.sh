@@ -25,19 +25,16 @@ OS=$(detect_os)
 ARCH=$(detect_architecture)
 REPO_OWNER="sev-2"
 REPO_NAME="raiden"
-RELEASE_TAG="v1.0.0"
+RELEASE_TAG="v1.0.0-alpha.1"
 DOWNLOAD_URL="https://github.com/$REPO_OWNER/$REPO_NAME/releases/download/$RELEASE_TAG"
 
 # Download binary according to OS and architecture
 case "$OS" in
     "linux")
-        DOWNLOAD_URL="$DOWNLOAD_URL/$REPO_NAME-$RELEASE_TAG-linux-$ARCH"
+        DOWNLOAD_URL="$DOWNLOAD_URL/$REPO_NAME-linux-$ARCH"
         ;;
     "macos")
-        DOWNLOAD_URL="$DOWNLOAD_URL/$REPO_NAME-$RELEASE_TAG-macos-$ARCH"
-        ;;
-    "windows")
-        DOWNLOAD_URL="$DOWNLOAD_URL/$REPO_NAME-$RELEASE_TAG-windows-$ARCH.exe"
+        DOWNLOAD_URL="$DOWNLOAD_URL/$REPO_NAME-macos-$ARCH"
         ;;
     *)
         echo "Unsupported OS"
