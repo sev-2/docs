@@ -39,6 +39,7 @@ export default defineConfig({
           { text: 'Configuration', link: '/docs/config' },
           { text: 'Controller', link: '/docs/controller' },
           { text: 'Model', link: '/docs/model' },
+          { text: 'REST', link: '/docs/rest' },
           { text: 'RPC', link: '/docs/rpc' },
           { text: 'ACL', link: '/docs/acl' },
           { text: 'Testing', link: '/docs/testing' },
