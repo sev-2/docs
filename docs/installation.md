@@ -47,7 +47,7 @@ sudo apt-get install raiden
 On macOS, you can install through [Homebrew](https://brew.sh).
 
 ```sh
-brew install sev-2/raiden
+brew install sev-2/raiden/raiden
 ```
 
 ## Windows
