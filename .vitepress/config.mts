@@ -41,6 +41,7 @@ export default defineConfig({
           { text: 'Model', link: '/docs/model' },
           { text: 'REST', link: '/docs/rest' },
           { text: 'RPC', link: '/docs/rpc' },
+          { text: 'Storage', link: '/docs/storage' },
           { text: 'Realtime', link: '/docs/realtime' },
           { text: 'ACL', link: '/docs/acl' },
           { text: 'Testing', link: '/docs/testing' },
