@@ -24,12 +24,24 @@ if [ -z "$BIN_PATH" ]; then
 fi
 
 # Step 1: Backup existing binary
-sudo cp "$BIN_PATH" "${BIN_PATH}.old"
+if [ -w "$BIN_PATH" ]; then
+    cp "$BIN_PATH" "${BIN_PATH}.old"
+else
+    sudo cp "$BIN_PATH" "${BIN_PATH}.old"
+fi
 
 # Step 2: Replace with new binary
-sudo cp "$TEMP_BINARY_PATH" "$BIN_PATH"
+if [ -w "$BIN_PATH" ]; then
+    cp "$TEMP_BINARY_PATH" "$BIN_PATH"
+else
+    sudo cp "$TEMP_BINARY_PATH" "$BIN_PATH"
+fi
 
 # Step 3: Set executable permissions
-sudo chmod +x "$BIN_PATH"
+if [ -w "$BIN_PATH" ]; then
+    chmod +x "$BIN_PATH"
+else
+    sudo chmod +x "$BIN_PATH"
+fi
 
-echo "'raiden' updated successfully."
+raiden version
