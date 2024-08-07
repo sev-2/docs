@@ -44,6 +44,7 @@ export default defineConfig({
               { text: 'REST', link: '/docs/rest' },
               { text: 'RPC', link: '/docs/rpc' },
               { text: 'Function', link: '/docs/function' },
+              { text: 'Custom', link: '/docs/custom' },
               { text: 'Storage', link: '/docs/storage' },
             ],
           },
