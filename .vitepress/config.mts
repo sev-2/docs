@@ -48,7 +48,13 @@ export default defineConfig({
               { text: 'Storage', link: '/docs/storage' },
             ],
           },
-          { text: 'Model', link: '/docs/model' },
+          {
+            text: 'Model',
+            link: '/docs/model',
+            items: [
+              { text: 'Database Query', link: '/docs/database-query' }
+            ],
+          },
           { text: 'Realtime', link: '/docs/realtime' },
           { text: 'ACL', link: '/docs/acl' },
           { text: 'Testing', link: '/docs/testing' },
