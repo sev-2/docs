@@ -16,7 +16,7 @@ Default Raiden project structure.
 │       └── ...
 ├── cmd
 │   └── project-name
-│       └── project-name.go    # Main project
+│       └── project_name.go    # Main project
 │   └── apply/main.go
 │   └── import/main.go
 ├── internal
@@ -24,7 +24,8 @@ Default Raiden project structure.
 │   │   ├── route.go
 │   │   ├── rpc.go
 │   │   ├── roles.go
-│   │   └── models.go
+│   │   ├── models.go
+│   │   └── storages.go
 │   ├── <b>controllers</b>
 │   │   └── <b>hello.go</b>    # Example controller
 │   ├── <b>roles</b>           # ACL/RLS definition

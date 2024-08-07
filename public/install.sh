@@ -46,4 +46,10 @@ esac
 echo "Downloading binary from $DOWNLOAD_URL"
 curl -LO "$DOWNLOAD_URL"
 
+chmod +x ./raiden
+
+[[ $OS == 'macos' ]] && xattr -rc ./raiden
+
 echo "Binary downloaded successfully!"
+
+./raiden version
