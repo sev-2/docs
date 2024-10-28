@@ -84,7 +84,7 @@ data, err := db.
   Lt("pages", 100). // [!code highlight]
   Get()
 // SQL: select * from books where pages < 100
-// URL: /rest/v1/books?select=*&id=lt.1
+// URL: /rest/v1/books?select=*&id=lt.100
 
 res, err = db.
   NewQuery(ctx).
@@ -92,7 +92,7 @@ res, err = db.
   Lte("pages", 100). // [!code highlight]
   Get()
 // SQL: select * from books where pages <= 100
-// URL: /rest/v1/books?select=*&id=lte.1
+// URL: /rest/v1/books?select=*&id=lte.100
 ```
 
 ### `.Gt()` & `.Gte()`
@@ -104,7 +104,7 @@ data, err := db.
   Gt("pages", 100). // [!code highlight]
   Get()
 // SQL: select * from books where pages > 100
-// URL: /rest/v1/books?select=*&id=gt.1
+// URL: /rest/v1/books?select=*&id=gt.100
 
 data, err := db.
   NewQuery(ctx).
@@ -112,7 +112,7 @@ data, err := db.
   Gte("pages", 100). // [!code highlight]
   Get()
 // SQL: select * from books where pages >= 100
-// URL: /rest/v1/books?select=*&id=gte.1
+// URL: /rest/v1/books?select=*&id=gte.100
 ```
 
 ### `.In()`
@@ -135,6 +135,26 @@ res, err = db.
 // URL: /rest/v1/books?select=*&slug=in.(raiden,supabase)
 ```
 
+### `.NotIn()`
+
+```go
+data, err := db.
+  NewQuery(ctx).
+  From(model).
+  NotIn("id", []int{1, 2, 3}). // [!code highlight]
+  Get()
+// SQL: select * from books where id not in (1, 2, 3)
+// URL: /rest/v1/books?select=*&id=not.in.(1,2,3)
+
+res, err = db.
+  NewQuery(ctx).
+  From(model).
+  NotIn("slug", []string{"raiden", "supabase"}). // [!code highlight]
+  Get()
+// SQL: select * from books where slug not in ('raiden', 'supabase')
+// URL: /rest/v1/books?select=*&slug=not.in.(raiden,supabase)
+```
+
 ### `.Like()` & `.Ilike()`
 
 ```go
@@ -153,6 +173,48 @@ data, err := db.
   Get()
 // SQL: select * from books where name ilike '%SuPa%'
 // URL: /rest/v1/books?select=*&name=ilike.*SuPa*
+```
+
+### `.NotLike()` & `.NotIlike()`
+
+```go
+data, err := db.
+  NewQuery(ctx).
+  From(model).
+  NotLike("name", "%rai%"). // [!code highlight]
+  Get()
+// SQL: select * from books where name not like '%rai%'
+// URL: /rest/v1/books?select=*&name=not.like.*rai*
+
+data, err := db.
+  NewQuery(ctx).
+  From(model).
+  NotIlike("name", "%SuPa%"). // [!code highlight]
+  Get()
+// SQL: select * from books where name not ilike '%SuPa%'
+// URL: /rest/v1/books?select=*&name=not.ilike.*SuPa*
+```
+
+### `.Is()` & `.NotIs()`
+
+`Is()` and `NotIs()` only accepts `true`, `false`, or `nil`.
+
+```go
+data, err := db.
+  NewQuery(ctx).
+  From(model).
+  Is("is_active", true). // [!code highlight]
+  Get()
+// SQL: select * from books where is_active is true
+// URL: /rest/v1/books?select=*&is_active=is.true
+
+data, err := db.
+  NewQuery(ctx).
+  From(model).
+  NotIs("is_active", true). // [!code highlight]
+  Get()
+// SQL: select * from books where is_active not is true
+// URL: /rest/v1/books?select=*&is_active=not.is.true
 ```
 
 ### `.OrderAsc()` & `.OrderDesc()`
