@@ -10,18 +10,29 @@ Here is the quick example to get data from `bookModel`.
 ::: code-group
 
 ```go [internal/controllers/books.go]
-func (c *GetMembersController) Get(ctx raiden.Context) error {
-  model := models.Books{}
+func (c *GetBooksController) Get(ctx raiden.Context) error {
+  var books []models.Books
 
-  data, err := db.
+  err := db.
     NewQuery(ctx).
-    From(model).
+    From(models.Books{}).
     Select([]string{"id", "name", "isbn"}).
     Eq("isbn", "9786235266008").
-    Get()
-
+    Get(&books)
   // SQL: select id, name, isbn from books where isbn = '9786235266008'
   // URL: /rest/v1/books?select=id,name,isbn&isbn=9786235266008
+
+  if err != nil {
+    fmt.Println(err)
+    panic("Whoops!")
+  }
+
+  fmt.Println(books)
+  fmt.Println(books[0].Id)
+  fmt.Println(books[0].Name)
+  fmt.Println(books[0].Isbn)
+
+  return ctx.SendJson(books)
 }
 ```
 
@@ -32,10 +43,12 @@ func (c *GetMembersController) Get(ctx raiden.Context) error {
 ### `.Select()`
 
 ```go
-data, err := db.NewQuery(ctx).
-  From(model).
+var books []models.Books
+
+err := db.NewQuery(ctx).
+  From(models.Books{}).
   Select([]sring{"id", "slug", "name"}). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select id, slug, name from books
 // URL: /rest/v1/books?select=id,slug,name
 ```
@@ -45,21 +58,55 @@ data, err := db.NewQuery(ctx).
 Use `:` to make an alias of column name with format `alias_name:original_name`.
 
 ```go
-data, err := db.NewQuery(ctx).
-  From(model).
+var books []models.Books
+
+err := db.NewQuery(ctx).
+  From(models.Books{}).
   Select([]sring{"id", "title:name"}). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select id, name as title from books
 // URL: /rest/v1/books?select=id,title:name
+```
+
+### `.Get()` and `.Limit()`
+
+Retrieve 10 rows of data.
+
+```go
+var books []models.Books
+
+err := db.NewQuery(ctx).
+  From(models.Books{}).
+  Limit(10)
+  Get(&books)
+// SQL: select * from books limit 10
+// URL: "/rest/v1/books?select=*&limit=10"
+```
+
+### `.Single()`
+
+Get single row of data.
+
+```go
+book := models.Books{}
+
+err := db.NewQuery(ctx).
+  From(models.Books{}).
+  Eq("id", 1). // [!code highlight]
+  Single(&book)
+// SQL: select * from books where id = 1 limit 1
+// cURL: "/rest/v1/books?select=*&id=eq.1" -H "Accept: application/vnd.pgrst.object+json"
 ```
 
 ### `.Eq()`
 
 ```go
-data, err := db.NewQuery(ctx).
-  From(model).
+var books []models.Books
+
+err := db.NewQuery(ctx).
+  From(models.Books{}).
   Eq("id", 1). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where id = 1
 // URL: /rest/v1/books?select=*&id=eq.1
 ```
@@ -67,10 +114,12 @@ data, err := db.NewQuery(ctx).
 ### `.Neq()`
 
 ```go
-data, err := db.NewQuery(ctx).
-  From(model).
+var books []models.Books
+
+err := db.NewQuery(ctx).
+  From(models.Books{}).
   Neq("id", 1). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where id != 1
 // URL: /rest/v1/books?select=*&id=neq.1
 ```
@@ -78,19 +127,21 @@ data, err := db.NewQuery(ctx).
 ### `.Lt()` & `.Lte()`
 
 ```go
-data, err := db.
+var books []models.Books
+
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   Lt("pages", 100). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where pages < 100
 // URL: /rest/v1/books?select=*&id=lt.100
 
-res, err = db.
+err = db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   Lte("pages", 100). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where pages <= 100
 // URL: /rest/v1/books?select=*&id=lte.100
 ```
@@ -98,19 +149,21 @@ res, err = db.
 ### `.Gt()` & `.Gte()`
 
 ```go
-data, err := db.
+var books []models.Books
+
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   Gt("pages", 100). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where pages > 100
 // URL: /rest/v1/books?select=*&id=gt.100
 
-data, err := db.
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   Gte("pages", 100). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where pages >= 100
 // URL: /rest/v1/books?select=*&id=gte.100
 ```
@@ -118,19 +171,21 @@ data, err := db.
 ### `.In()`
 
 ```go
-data, err := db.
+var books []models.Books
+
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   In("id", []int{1, 2, 3}). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where id in (1, 2, 3)
 // URL: /rest/v1/books?select=*&id=in.(1,2,3)
 
-res, err = db.
+err = db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   In("slug", []string{"raiden", "supabase"}). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where slug in ('raiden', 'supabase')
 // URL: /rest/v1/books?select=*&slug=in.(raiden,supabase)
 ```
@@ -138,19 +193,21 @@ res, err = db.
 ### `.NotIn()`
 
 ```go
-data, err := db.
+var books []models.Books
+
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   NotIn("id", []int{1, 2, 3}). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where id not in (1, 2, 3)
 // URL: /rest/v1/books?select=*&id=not.in.(1,2,3)
 
-res, err = db.
+err = db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   NotIn("slug", []string{"raiden", "supabase"}). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where slug not in ('raiden', 'supabase')
 // URL: /rest/v1/books?select=*&slug=not.in.(raiden,supabase)
 ```
@@ -158,19 +215,21 @@ res, err = db.
 ### `.Like()` & `.Ilike()`
 
 ```go
-data, err := db.
+var books []models.Books
+
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   Like("name", "%rai%"). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where name like '%rai%'
 // URL: /rest/v1/books?select=*&name=like.*rai*
 
-data, err := db.
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   Ilike("name", "%SuPa%"). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where name ilike '%SuPa%'
 // URL: /rest/v1/books?select=*&name=ilike.*SuPa*
 ```
@@ -178,19 +237,21 @@ data, err := db.
 ### `.NotLike()` & `.NotIlike()`
 
 ```go
-data, err := db.
+var books []models.Books
+
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   NotLike("name", "%rai%"). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where name not like '%rai%'
 // URL: /rest/v1/books?select=*&name=not.like.*rai*
 
-data, err := db.
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   NotIlike("name", "%SuPa%"). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where name not ilike '%SuPa%'
 // URL: /rest/v1/books?select=*&name=not.ilike.*SuPa*
 ```
@@ -200,19 +261,21 @@ data, err := db.
 `Is()` and `NotIs()` only accepts `true`, `false`, or `nil`.
 
 ```go
-data, err := db.
+var books []models.Books
+
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   Is("is_active", true). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where is_active is true
 // URL: /rest/v1/books?select=*&is_active=is.true
 
-data, err := db.
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   NotIs("is_active", true). // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books where is_active not is true
 // URL: /rest/v1/books?select=*&is_active=not.is.true
 ```
@@ -220,19 +283,21 @@ data, err := db.
 ### `.OrderAsc()` & `.OrderDesc()`
 
 ```go
-data, err := db.
+var books []models.Books
+
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   OrderAsc("created_at") // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books order by created_at asc
 // URL: /rest/v1/books?select=*&order=created_at.asc
 
-data, err := db.
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   OrderDesc("created_at") // [!code highlight]
-  Get()
+  Get(&books)
 // SQL: select * from books order by created_at desc
 // URL: /rest/v1/books?select=*&order=created_at.desc
 ```
@@ -240,35 +305,34 @@ data, err := db.
 ## Insert
 
 ```go{4,7}
-data, err := db.
+payload := models.Products{name: "Chair", price: 20}
+
+err := db.
   NewQuery(ctx).
-  From(model).
-  Insert(models.Products{
-    name: "Chair",
-    price: 20,
-  })
+  From(models.Books{}).
+  Insert(&payload, nil)
 // insert into products (name, price) values ('Chair', 20)
 ```
 
 ## Update
 
 ```go{4,7}
-data, err := db.
+payload := models.Products{slug: "raiden"}
+
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   Eq("id", 1).
-  Update(models.Products{
-    slug: "raiden",
-  })
+  Update(payload, nil)
 // SQL: update products set slug = 'raiden' where id = 1
 ```
 
 ## Delete
 
 ```go{4,5}
-data, err := db.
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   Eq("id", 1).
   Delete()
 // SQL: delete from products where id = 1
@@ -277,8 +341,6 @@ data, err := db.
 ## Upsert
 
 ```go
-model := models.Products{}
-
 id1 := int64(6)
 name1 := "Cake"
 slug1 := "cake"
@@ -314,9 +376,9 @@ opt := db.UpsertOptions{
   OnConflict: db.MergeDuplicates, // or db.IgnoreDuplicates
 }
 
-data, err := db.
+err := db.
   NewQuery(ctx).
-  From(model).
+  From(models.Books{}).
   Upsert(payload, opt) // [!code highlight]
 
 // SQL:
@@ -335,12 +397,14 @@ data, err := db.
 By using `.With()`, you can get the relation of a model.
 
 ```go
+var books []models.Books
+
 res := db.
   NewQuery(ctx).
   From(models.Books{}).
   With("Authors", nil). // models.Authors{}
   With("Publishers", nil). // models.Publishers{}
-  Get()
+  Get(&books)
 
 // SQL:
 // select books.*, users.*, publishers.* from books
@@ -353,11 +417,13 @@ res := db.
 ### Nested Relations
 
 ```go
+var books []models.Books
+
 res := db.
   NewQuery(ctx).
   From(models.Books{}).
   With("Authors.Teams.Orgs", nil).
-  Get()
+  Get(&books)
 
 // URL: /rest/v1/books?select=*,users(*,teams(*,orgs(*)))
 ```
@@ -365,7 +431,9 @@ res := db.
 ### Column Selections
 
 ```go
-data, err := db.
+var books []models.Books
+
+err := db.
   NewQuery(ctx).
   From(models.Books{}).
   With(
@@ -375,7 +443,7 @@ data, err := db.
       "orgs":       {"id", "name"},
     },
   ).
-  Get()
+  Get(&books)
 
 // URL: /rest/v1/books?select=*,publishers(id,name,orgs(id,name))
 ```
@@ -409,17 +477,21 @@ Since the `orders` table has two foreign keys to the `addresses` table, a foreig
 
 ```go
 // Error
-data, err := db.
+orders := []models.Orders{}
+
+err := db.
   NewQuery(ctx).
   From(models.Orders{}).
   With("Addresses", nil).
-  Get()
+  Get(&orders)
 ```
 
 To successfully join `orders` with `addresses` you need to add explicit foreign key by adding `!` symbol with format `table!foreign_key`.
 
 ```go
-data, err := db.
+orders := []models.Orders{}
+
+err := db.
   NewQuery(ctx).
   From(models.Orders{}).
   With(
@@ -428,7 +500,7 @@ data, err := db.
       "addresses!shipping_id": {"*"},
     },
   ).
-  Get()
+  Get(&orders)
 
 // URL: /rest/v1/orders?select=*,addresses!shipping_id(*)
 ```
@@ -436,7 +508,9 @@ data, err := db.
 To add the shipping address and billing address you need to use alias.
 
 ```go
-data, err := db.
+orders := []models.Orders{}
+
+err := db.
   NewQuery(ctx).
   From(models.Orders{}).
   With(
@@ -451,7 +525,7 @@ data, err := db.
       "billing_address:addresses!billing_id": {"*"},
     },
   ).
-  Get()
+  Get(&orders)
 
 // URL: /rest/v1/orders?select=*,shipping_address:addresses!shipping_id(*),billing_address:addresses!billing_id(*)
 ```
