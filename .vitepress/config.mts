@@ -12,6 +12,10 @@ export default defineConfig({
       provider: 'local'
     },
 
+    outline: {
+      level: 'deep',
+    },
+
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Getting Started', link: '/docs/quick-start' },
