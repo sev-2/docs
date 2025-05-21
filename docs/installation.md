@@ -10,7 +10,13 @@ The quickest way to install Raiden is by run this command
 sh -c "$(curl -fsSL https://raiden.sev-2.com/install.sh)"
 ```
 
-The command above will detect your OS and CPU architecture, then install it to your `$PATH`.
+The command above will detect your OS and CPU architecture, then install raiden latest version to your `$PATH`.
+
+To install raiden specific version, use the `--version` flag
+
+```sh
+sh -c "$(curl -fsSL https://raiden.sev-2.com/install.sh)" -- --version v1.2.3
+```
 
 ```
 cp raiden-linux-amd64 /usr/local/bin/raiden
