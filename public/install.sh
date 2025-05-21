@@ -1,55 +1,75 @@
 #!/bin/sh
+set -euo pipefail
 
-# Function to detect operating system
+# Detect OS
 detect_os() {
     case "$(uname -s)" in
         Linux*)   echo "linux" ;;
         Darwin*)  echo "macos" ;;
         CYGWIN*|MINGW*) echo "windows" ;;
-        *)        echo "Unsupported OS" ; exit 1 ;;
+        *)        echo "Unsupported OS" >&2; exit 1 ;;
     esac
 }
 
-# Function to detect architecture
+# Detect Architecture
 detect_architecture() {
     case "$(uname -m)" in
         x86_64)   echo "amd64" ;;
-        aarch64)  echo "arm64" ;;
-        arm64)  echo "arm64" ;;
-        *)        echo "Unsupported architecture" ; exit 1 ;;
+        aarch64|arm64) echo "arm64" ;;
+        *)        echo "Unsupported architecture" >&2; exit 1 ;;
     esac
 }
 
-# Main script
-OS=$(detect_os)
-ARCH=$(detect_architecture)
+# Default version
+VERSION="latest"
+
+# Parse arguments
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --version)
+            VERSION="${2:-}"
+            if [ -z "$VERSION" ]; then
+                echo "Error: --version requires a value" >&2
+                exit 1
+            fi
+            shift
+            ;;
+        --help|-h)
+            echo "Usage: $0 [--version <tag>]"
+            exit 0
+            ;;
+        *)
+            echo "Unknown argument: $1" >&2
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+# Variables
+OS="$(detect_os)"
+ARCH="$(detect_architecture)"
 REPO_OWNER="sev-2"
 REPO_NAME="raiden"
-RELEASE_TAG="v1.0.0-beta.40"
-DOWNLOAD_URL="https://github.com/$REPO_OWNER/$REPO_NAME/releases/download/$RELEASE_TAG"
+FILE_NAME="$REPO_NAME-$OS-$ARCH"
 
-# Download binary according to OS and architecture
-case "$OS" in
-    "linux")
-        DOWNLOAD_URL="$DOWNLOAD_URL/$REPO_NAME-linux-$ARCH"
-        ;;
-    "macos")
-        DOWNLOAD_URL="$DOWNLOAD_URL/$REPO_NAME-macos-$ARCH"
-        ;;
-    *)
-        echo "Unsupported OS"
-        exit 1
-        ;;
-esac
+# Determine download URL
+if [ "$VERSION" = "latest" ]; then
+    DOWNLOAD_URL="https://github.com/$REPO_OWNER/$REPO_NAME/releases/latest/download/$FILE_NAME"
+else
+    DOWNLOAD_URL="https://github.com/$REPO_OWNER/$REPO_NAME/releases/download/$VERSION/$FILE_NAME"
+fi
 
-# Download the binary
+# Download
 echo "Downloading binary from $DOWNLOAD_URL"
-curl -LO "$DOWNLOAD_URL"
+if ! curl -fLo "$FILE_NAME" "$DOWNLOAD_URL"; then
+    echo "Error: Failed to download version '$VERSION'. It may not exist." >&2
+    exit 1
+fi
 
-chmod +x ./raiden
+chmod +x "$FILE_NAME"
 
-[[ $OS == 'macos' ]] && xattr -rc ./raiden
+[ "$OS" = "macos" ] && xattr -rc "$FILE_NAME"
 
 echo "Binary downloaded successfully!"
-
-./raiden version
+./"$FILE_NAME" version
