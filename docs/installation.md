@@ -18,9 +18,10 @@ To install raiden specific version, use the `--version` flag
 sh -c "$(curl -fsSL https://raiden.sev-2.com/install.sh)" -- --version v1.2.3
 ```
 
+You can manually download the binary from [Raiden Github Release page](https://github.com/sev-2/raiden/releases)
 ```
-cp raiden-linux-amd64 /usr/local/bin/raiden
-chmod +x /usr/local/bin/raiden
+sudo cp raiden-linux-amd64 /usr/local/bin/raiden
+sudo chmod +x /usr/local/bin/raiden
 raiden version
 ```
 
