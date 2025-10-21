@@ -6,7 +6,7 @@ title: REST
 
 REST API is the easiest way to interact your client application with your database.
 To use REST API on Raiden you need to have a model, then you can define `type:"rest"`
-and `path` of the controller.
+and the controller's folder structure will determine the route.
 
 ::: code-group
 
@@ -20,14 +20,13 @@ import (
 
 type BooksController struct {
 	raiden.ControllerBase
-	Http  string `path:"/books" type:"rest"` // [!code highlight]
 	Model models.Book // [!code highlight]
 }
 ```
 
 :::
 
-In that example, it use Book model, `/books` as the path, and rest type of controller.
+In that example, it uses the `Book` model, and the route will be determined by the controller's folder structure (e.g., if `BooksController` is in `controllers/books`, the route would be `/books`). For a detailed explanation of Raiden's convention-based routing, including dynamic routes, please refer to the [Controller documentation](./controller.md).
 When you execute `raiden run` it will create new REST API endpoints:
 
 ```
