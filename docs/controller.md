@@ -67,12 +67,12 @@ to use specific HTTP verb request.
 For example, if you want to use `Post` and `Delete` request.
 
 ```go
-func (c *HelloWorldController) Post(ctx raiden.Context) raiden.Presenter { // [!code highlight]
+func (c *HelloWorldController) Post(ctx raiden.Context) error { // [!code highlight]
     c.Result.Message = "Data has been inserted."
     return ctx.SendJson(c.Result)
 }
 
-func (c *HelloWorldController) Delete(ctx raiden.Context) raiden.Presenter { // [!code highlight]
+func (c *HelloWorldController) Delete(ctx raiden.Context) error { // [!code highlight]
     c.Result.Message = "Data has been deleted."
     return ctx.SendJson(c.Result)
 }
@@ -95,3 +95,82 @@ type HelloWorldController struct {
 ::: info
 The `rpc` type only available for `Post` verb.
 :::
+
+## Lifecycle Hooks
+
+Each controller handler supports `Before` and `After` hooks. These hooks run before and after the main handler method, allowing you to add logic like authorization checks, logging, or response transformations.
+
+Available hooks:
+
+| Hook | Description |
+|------|-------------|
+| `BeforeAll` / `AfterAll` | Runs before/after **any** HTTP method handler |
+| `BeforeGet` / `AfterGet` | Runs before/after `Get` handler |
+| `BeforePost` / `AfterPost` | Runs before/after `Post` handler |
+| `BeforePut` / `AfterPut` | Runs before/after `Put` handler |
+| `BeforePatch` / `AfterPatch` | Runs before/after `Patch` handler |
+| `BeforeDelete` / `AfterDelete` | Runs before/after `Delete` handler |
+| `BeforeOptions` / `AfterOptions` | Runs before/after `Options` handler |
+| `BeforeHead` / `AfterHead` | Runs before/after `Head` handler |
+
+### Example
+
+```go
+type HelloWorldController struct {
+    raiden.ControllerBase
+    Payload *HelloWorldRequest
+    Result  HelloWorldResponse
+}
+
+func (c *HelloWorldController) BeforeGet(ctx raiden.Context) error {
+    // Authorization check before Get handler
+    userRole := ctx.Get("role")
+    if userRole != "admin" {
+        return ctx.SendErrorWithCode(403, fmt.Errorf("forbidden"))
+    }
+    return nil
+}
+
+func (c *HelloWorldController) Get(ctx raiden.Context) error {
+    c.Result.Message = "Welcome to raiden"
+    return ctx.SendJson(c.Result)
+}
+
+func (c *HelloWorldController) AfterGet(ctx raiden.Context) error {
+    // Log after Get handler
+    fmt.Println("Get handler completed")
+    return nil
+}
+```
+
+## RestController
+
+`RestController` provides automatic CRUD operations for a model by proxying requests to the Supabase REST API. You don't need to write individual `Get`, `Post`, `Put`, `Patch`, or `Delete` handlers.
+
+```go
+type ProductsController struct {
+    raiden.RestController
+    Model   models.Products
+    Payload *ProductsRequest
+    Result  ProductsResponse
+}
+```
+
+With `RestController`, the following endpoints are automatically available:
+
+| Method | Description |
+|--------|-------------|
+| `GET`  | Retrieve data (list or single) |
+| `POST` | Insert new data |
+| `PUT`  | Replace existing data |
+| `PATCH` | Update existing data |
+| `DELETE` | Delete data |
+
+You can still override any handler or add `Before`/`After` hooks to customize behavior:
+
+```go
+func (c *ProductsController) BeforePost(ctx raiden.Context) error {
+    // Validate payload before insert
+    return nil
+}
+```

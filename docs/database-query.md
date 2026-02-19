@@ -47,7 +47,7 @@ var books []models.Books
 
 err := db.NewQuery(ctx).
   From(models.Books{}).
-  Select([]sring{"id", "slug", "name"}). // [!code highlight]
+  Select([]string{"id", "slug", "name"}). // [!code highlight]
   Get(&books)
 // SQL: select id, slug, name from books
 // URL: /rest/v1/books?select=id,slug,name
@@ -62,7 +62,7 @@ var books []models.Books
 
 err := db.NewQuery(ctx).
   From(models.Books{}).
-  Select([]sring{"id", "title:name"}). // [!code highlight]
+  Select([]string{"id", "title:name"}). // [!code highlight]
   Get(&books)
 // SQL: select id, name as title from books
 // URL: /rest/v1/books?select=id,title:name
@@ -77,7 +77,7 @@ var books []models.Books
 
 err := db.NewQuery(ctx).
   From(models.Books{}).
-  Limit(10)
+  Limit(10).
   Get(&books)
 // SQL: select * from books limit 10
 // URL: "/rest/v1/books?select=*&limit=10"
@@ -159,7 +159,7 @@ err := db.
 // SQL: select * from books where pages > 100
 // URL: /rest/v1/books?select=*&id=gt.100
 
-err := db.
+err = db.
   NewQuery(ctx).
   From(models.Books{}).
   Gte("pages", 100). // [!code highlight]
@@ -225,7 +225,7 @@ err := db.
 // SQL: select * from books where name like '%rai%'
 // URL: /rest/v1/books?select=*&name=like.*rai*
 
-err := db.
+err = db.
   NewQuery(ctx).
   From(models.Books{}).
   Ilike("name", "%SuPa%"). // [!code highlight]
@@ -247,7 +247,7 @@ err := db.
 // SQL: select * from books where name not like '%rai%'
 // URL: /rest/v1/books?select=*&name=not.like.*rai*
 
-err := db.
+err = db.
   NewQuery(ctx).
   From(models.Books{}).
   NotIlike("name", "%SuPa%"). // [!code highlight]
@@ -271,7 +271,7 @@ err := db.
 // SQL: select * from books where is_active is true
 // URL: /rest/v1/books?select=*&is_active=is.true
 
-err := db.
+err = db.
   NewQuery(ctx).
   From(models.Books{}).
   NotIs("is_active", true). // [!code highlight]
@@ -288,18 +288,135 @@ var books []models.Books
 err := db.
   NewQuery(ctx).
   From(models.Books{}).
-  OrderAsc("created_at") // [!code highlight]
+  OrderAsc("created_at"). // [!code highlight]
   Get(&books)
 // SQL: select * from books order by created_at asc
 // URL: /rest/v1/books?select=*&order=created_at.asc
 
-err := db.
+err = db.
   NewQuery(ctx).
   From(models.Books{}).
-  OrderDesc("created_at") // [!code highlight]
+  OrderDesc("created_at"). // [!code highlight]
   Get(&books)
 // SQL: select * from books order by created_at desc
 // URL: /rest/v1/books?select=*&order=created_at.desc
+```
+
+### `.Offset()`
+
+Skip a number of rows before returning results. Commonly used with `.Limit()` for pagination.
+
+```go
+var books []models.Books
+
+err := db.
+  NewQuery(ctx).
+  From(models.Books{}).
+  Limit(10).
+  Offset(20). // [!code highlight]
+  Get(&books)
+// SQL: select * from books limit 10 offset 20
+// URL: /rest/v1/books?select=*&limit=10&offset=20
+```
+
+### Or Conditions
+
+Use `Or` variants of filter methods to build `OR` conditions. Multiple `Or` calls are grouped together.
+
+```go
+var books []models.Books
+
+err := db.
+  NewQuery(ctx).
+  From(models.Books{}).
+  OrEq("status", "published"). // [!code highlight]
+  OrEq("status", "draft"). // [!code highlight]
+  Get(&books)
+// URL: /rest/v1/books?select=*&or=(status.eq.published,status.eq.draft)
+```
+
+Available `Or` methods: `.OrEq()`, `.OrNeq()`, `.OrLt()`, `.OrLte()`, `.OrGt()`, `.OrGte()`, `.OrIn()`, `.OrLike()`, `.OrIlike()`.
+
+### Not Conditions
+
+Use `Not` variants to negate filter conditions.
+
+```go
+var books []models.Books
+
+err := db.
+  NewQuery(ctx).
+  From(models.Books{}).
+  NotEq("status", "archived"). // [!code highlight]
+  Get(&books)
+// URL: /rest/v1/books?select=*&status=not.eq.archived
+```
+
+Available `Not` methods: `.NotEq()`, `.NotNeq()`, `.NotLt()`, `.NotLte()`, `.NotGt()`, `.NotGte()`, `.NotLike()`, `.NotIlike()`.
+
+## Aggregate Functions
+
+### `.Count()`
+
+Get the total number of rows matching the query.
+
+```go
+count, err := db.
+  NewQuery(ctx).
+  From(models.Books{}).
+  Eq("is_active", true).
+  Count() // [!code highlight]
+// Returns the count of active books
+```
+
+You can specify the count method with `CountOptions`:
+
+```go
+count, err := db.
+  NewQuery(ctx).
+  From(models.Books{}).
+  Count(db.CountOptions{Count: "exact"}) // [!code highlight]
+// Options: "exact", "planned", "estimated"
+```
+
+### `.Sum()`
+
+```go
+var result []map[string]interface{}
+
+err := db.
+  NewQuery(ctx).
+  From(models.Products{}).
+  Sum("price", "total_price"). // [!code highlight]
+  Get(&result)
+// URL: /rest/v1/products?select=total_price:price.sum()
+```
+
+### `.Avg()`
+
+```go
+var result []map[string]interface{}
+
+err := db.
+  NewQuery(ctx).
+  From(models.Products{}).
+  Avg("price", "average_price"). // [!code highlight]
+  Get(&result)
+// URL: /rest/v1/products?select=average_price:price.avg()
+```
+
+### `.Min()` & `.Max()`
+
+```go
+var result []map[string]interface{}
+
+err := db.
+  NewQuery(ctx).
+  From(models.Products{}).
+  Min("price", "lowest_price"). // [!code highlight]
+  Max("price", "highest_price"). // [!code highlight]
+  Get(&result)
+// URL: /rest/v1/products?select=lowest_price:price.min(),highest_price:price.max()
 ```
 
 ## Insert
@@ -394,7 +511,7 @@ err := db.
 
 ### Get Relations
 
-By using `.With()`, you can get the relation of a model.
+By using `.Preload()`, you can get the relation of a model. The first argument is the relation field name on the model struct.
 
 ```go
 var books []models.Books
@@ -402,8 +519,8 @@ var books []models.Books
 res := db.
   NewQuery(ctx).
   From(models.Books{}).
-  With("Authors", nil). // models.Authors{}
-  With("Publishers", nil). // models.Publishers{}
+  Preload("Authors"). // models.Authors{}
+  Preload("Publishers"). // models.Publishers{}
   Get(&books)
 
 // SQL:
@@ -422,110 +539,43 @@ var books []models.Books
 res := db.
   NewQuery(ctx).
   From(models.Books{}).
-  With("Authors.Teams.Orgs", nil).
+  Preload("Authors.Teams.Orgs").
   Get(&books)
 
 // URL: /rest/v1/books?select=*,users(*,teams(*,orgs(*)))
 ```
 
-### Column Selections
+::: warning
+Nested relations support up to 3 levels deep.
+:::
+
+### Filtering Relations
+
+You can add a where condition to the preloaded relation by passing additional arguments in the format: `field`, `operator`, `value`.
 
 ```go
-var books []models.Books
+var users []models.Users
 
 err := db.
   NewQuery(ctx).
-  From(models.Books{}).
-  With(
-    "Publishers.Orgs",
-    map[string][]string{
-      "publishers": {"id", "name"},
-      "orgs":       {"id", "name"},
-    },
-  ).
-  Get(&books)
+  From(models.Users{}).
+  Preload("Articles", "rating", "eq", "5").
+  Get(&users)
 
-// URL: /rest/v1/books?select=*,publishers(id,name,orgs(id,name))
+// URL: /rest/v1/users?select=*,articles!article_id(*)&articles.rating=eq.5
 ```
 
-### Foreign Keys
-
-Assume you have this tables
-
-```sql
-create table
-  public.orders (
-    id bigint generated by default as identity not null,
-    created_at timestamp with time zone not null default now(),
-    billing_id bigint null,
-    shipping_id bigint null,
-    constraint orders_pkey primary key (id),
-    constraint orders_shipping_id_fkey foreign key (shipping_id) references addresses (id),
-    constraint orders_billing_id_fkey foreign key (billing_id) references addresses (id)
-  ) tablespace pg_default;
-
-create table
-  public.addresses (
-    id bigint generated by default as identity not null,
-    created_at timestamp with time zone not null default now(),
-    name text not null,
-    constraint addresses_pkey primary key (id)
-  ) tablespace pg_default;
-```
-
-Since the `orders` table has two foreign keys to the `addresses` table, a foreign key join is ambiguous and you will get an error.
+### Multiple Relations
 
 ```go
-// Error
-orders := []models.Orders{}
+var users []models.Users
 
 err := db.
   NewQuery(ctx).
-  From(models.Orders{}).
-  With("Addresses", nil).
-  Get(&orders)
-```
+  From(models.Users{}).
+  Preload("Articles").
+  Preload("Team").
+  Get(&users)
 
-To successfully join `orders` with `addresses` you need to add explicit foreign key by adding `!` symbol with format `table!foreign_key`.
-
-```go
-orders := []models.Orders{}
-
-err := db.
-  NewQuery(ctx).
-  From(models.Orders{}).
-  With(
-    "Addresses",
-    map[string][]string{
-      "addresses!shipping_id": {"*"},
-    },
-  ).
-  Get(&orders)
-
-// URL: /rest/v1/orders?select=*,addresses!shipping_id(*)
-```
-
-To add the shipping address and billing address you need to use alias.
-
-```go
-orders := []models.Orders{}
-
-err := db.
-  NewQuery(ctx).
-  From(models.Orders{}).
-  With(
-    "Addresses",
-    map[string][]string{
-      "shipping_address:addresses!shipping_id": {"*"},
-    },
-  ).
-  With(
-    "Addresses",
-    map[string][]string{
-      "billing_address:addresses!billing_id": {"*"},
-    },
-  ).
-  Get(&orders)
-
-// URL: /rest/v1/orders?select=*,shipping_address:addresses!shipping_id(*),billing_address:addresses!billing_id(*)
+// URL: /rest/v1/users?select=*,articles!article_id(*),team:teams!team_id(*)
 ```
