@@ -60,8 +60,10 @@ Available struct tag values inside `column:`:
 | `autoIncrement` | No       | Column with this key will be auto-incrementing. The column must be a numeric. |
 | `nullable`      | No       | To determine a column is nullable or not by define `nullable:true` or `nullable:false`. |
 | `default`       | No       | The default value of column based on column data type. Example: `default:'255'` or `default:now()`. |
+| `unique`        | No       | Column with this key will have a unique constraint. |
+| `index`         | No       | Column with this key will be indexed. |
 
-The `json:"body,omitempty` will be the JSON key of response.
+The `json:"body,omitempty"` will be the JSON key of response.
 To understand about JSON encoding on Go, read https://pkg.go.dev/encoding/json.
 
 ### Metadata
@@ -69,13 +71,77 @@ To understand about JSON encoding on Go, read https://pkg.go.dev/encoding/json.
 You can set which is the schema of a table will be created by update schema on Metadata field.
 Usually the value of schema is `public`.
 
+You can also set a custom table name using the `tableName` tag. If not specified, the table name defaults to the snake_case version of the struct name.
+
 ```go
 type Books struct {
     // ...
 
-    Metadata string `json:"-" schema:"public"` // [!code highlight]
+    Metadata string `json:"-" schema:"public" tableName:"my_books"` // [!code highlight]
 }
 ```
+
+### Relations
+
+Raiden supports defining relationships between models using the `join` struct tag. Relations allow you to express `hasOne`, `hasMany`, and `manyToMany` associations.
+
+#### Has One
+
+```go
+type Users struct {
+    raiden.ModelBase
+
+    Id      int64  `json:"id,omitempty" column:"name:id;type:bigint;primaryKey;autoIncrement;nullable:false"`
+    Name    string `json:"name,omitempty" column:"name:name;type:varchar;nullable:false"`
+
+    Profile *Profiles `json:"profile,omitempty" join:"joinType:hasOne;primaryKey:id;foreignKey:user_id"` // [!code highlight]
+
+    Metadata string `json:"-" schema:"public"`
+}
+```
+
+#### Has Many
+
+```go
+type Users struct {
+    raiden.ModelBase
+
+    Id   int64  `json:"id,omitempty" column:"name:id;type:bigint;primaryKey;autoIncrement;nullable:false"`
+    Name string `json:"name,omitempty" column:"name:name;type:varchar;nullable:false"`
+
+    Posts []Posts `json:"posts,omitempty" join:"joinType:hasMany;primaryKey:id;foreignKey:user_id"` // [!code highlight]
+
+    Metadata string `json:"-" schema:"public"`
+}
+```
+
+#### Many to Many
+
+```go
+type Users struct {
+    raiden.ModelBase
+
+    Id   int64  `json:"id,omitempty" column:"name:id;type:bigint;primaryKey;autoIncrement;nullable:false"`
+    Name string `json:"name,omitempty" column:"name:name;type:varchar;nullable:false"`
+
+    Roles []Roles `json:"roles,omitempty" join:"joinType:manyToMany;through:user_roles;sourcePrimaryKey:id;sourceForeignKey:user_id;targetPrimaryKey:id;targetForeign:role_id"` // [!code highlight]
+
+    Metadata string `json:"-" schema:"public"`
+}
+```
+
+Available `join` tag values:
+
+| Name               | Required    | Description |
+|--------------------|-------------|-------------|
+| `joinType`         | Yes         | Relation type: `hasOne`, `hasMany`, or `manyToMany`. |
+| `primaryKey`       | Yes (hasOne/hasMany) | The primary key column on the current model. |
+| `foreignKey`       | Yes (hasOne/hasMany) | The foreign key column on the related model. |
+| `through`          | Yes (manyToMany) | The junction/pivot table name. |
+| `sourcePrimaryKey` | Yes (manyToMany) | Primary key on the source (current) model. |
+| `sourceForeignKey` | Yes (manyToMany) | Foreign key column in the junction table pointing to the source. |
+| `targetPrimaryKey` | Yes (manyToMany) | Primary key on the target (related) model. |
+| `targetForeign`    | Yes (manyToMany) | Foreign key column in the junction table pointing to the target. |
 
 ### ACL
 

@@ -108,6 +108,32 @@ Handles the initialization and bootstrapping of various application components, 
 
 Defines the API controllers, which handle incoming requests and define the application's endpoints. This includes REST, RPC, and custom controllers. For more details, read [Controller](/docs/controller).
 
+Controllers follow a convention-based folder structure for routing. The folder name determines the URL path, and the Go file inside is named by controller type:
+
+| Controller Type | File Name    | Folder Name Convention | URL Example |
+|----------------|-------------|----------------------|-------------|
+| REST           | `rest.go`   | `snake_case`         | `/rest/v1/live-stream-sessions` |
+| RPC            | `rpc.go`    | `kebab-case`         | `/rest/v1/rpc/get-user-stats` |
+| Custom         | `custom.go` | `snake_case`         | `/custom-path` |
+
+Example directory layout:
+
+```
+internal/controllers/
+├── rest/v1/
+│   ├── books/
+│   │   └── rest.go           # GET/POST/PUT/PATCH/DELETE /rest/v1/books
+│   └── live_stream_sessions/
+│       └── rest.go           # GET/POST/PUT/PATCH/DELETE /rest/v1/live-stream-sessions
+├── rpc/
+│   ├── hello/
+│   │   └── rpc.go            # POST /rest/v1/rpc/hello
+│   └── get-user-stats/
+│       └── rpc.go            # POST /rest/v1/rpc/get-user-stats
+└── delivery/
+    └── custom.go             # Custom routes (e.g., /delivery)
+```
+
 #### internal/jobs
 
 Contains definitions for background jobs that perform asynchronous tasks.

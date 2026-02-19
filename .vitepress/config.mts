@@ -60,6 +60,8 @@ export default defineConfig({
             ],
           },
           { text: 'Realtime', link: '/docs/realtime' },
+          { text: 'Scheduler', link: '/docs/schedule' },
+          { text: 'Custom Types', link: '/docs/type' },
           { text: 'ACL', link: '/docs/acl' },
           { text: 'Testing', link: '/docs/testing' },
         ]
